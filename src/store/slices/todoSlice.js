@@ -1,28 +1,37 @@
-import { createSlice } from '@reduxjs/toolkit'
+import { createSlice } from "@reduxjs/toolkit";
+
+const savedTodos = JSON.parse(localStorage.getItem("todos")) || [];
 
 const initialState = {
-  todos:[],
-}
+  todos: savedTodos,
+};
 
 export const todoSlice = createSlice({
-  name: 'todos',
+  name: "todos",
   initialState,
   reducers: {
     addTodo: (state, action) => {
-      state.todos.push(action.payload);
+      state.todos.unshift(action.payload);
+      localStorage.setItem("todos", JSON.stringify(state.todos));
     },
+
     deleteTodo: (state, action) => {
-        state.todos = state.todos.filter((_,index)=> index !== action.payload);
+      state.todos.splice(action.payload, 1);
+      localStorage.setItem("todos", JSON.stringify(state.todos));
     },
-     completeTodo: (state, action) => {
-      state.todos[action.payload].completed = true;
+
+    completeTodo: (state, action) => {
+      state.todos[action.payload].completed = !state.todos[action.payload].completed;
+      localStorage.setItem("todos", JSON.stringify(state.todos));
+    },
+
+    editTodo: (state,action) => {
+      const { index, newText } = action.payload;
+      state.todos[index].text = newText;
+      localStorage.setItem("todos", JSON.stringify(state.todos));
     }
   },
-})
+});
 
-{/* <button onclick={incrementByAmount(5)}>5+</button> */}
-
-// Action creators are generated for each case reducer function
-export const { addTodo,deleteTodo,completeTodo } = todoSlice.actions
-
-export default todoSlice.reducer
+export const { addTodo, deleteTodo, completeTodo,editTodo } = todoSlice.actions;
+export default todoSlice.reducer;
